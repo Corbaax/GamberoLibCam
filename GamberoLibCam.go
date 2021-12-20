@@ -18,7 +18,7 @@ import (
 //#Region CamController
 type Ground struct {
 	Background, Cam              *ebiten.Image
-	CamX, CamY, CamDimX, CamDimY int
+	CamX, CamY, camDimX, CamDimY int
 	BackBoundX, BackBoundY       int
 	Translation                  int
 	ErrorOnCam                   string
@@ -30,32 +30,32 @@ type MovingOption struct {
 
 // Populate the Moving option with default value WASD
 func (NewObj *MovingOption) NewDefaultOption() {
-	NewObj.down = ebiten.KeyS
-	NewObj.up = ebiten.KeyW
-	NewObj.right = ebiten.KeyD
-	NewObj.left = ebiten.KeyA
+	NewObj.Down = ebiten.KeyS
+	NewObj.Up = ebiten.KeyW
+	NewObj.Right = ebiten.KeyD
+	NewObj.Left = ebiten.KeyA
 }
 
 // Populate the Moving option with the value in the slice, taking the first 4 value
-// assing as: 0 = down, 1 = up, 2 = right; 3 = left
+// assing as: 0 = down, 1 = up, 2 = Right; 3 = left
 func (NewObj *MovingOption) NewOptionFromSlice(keys []ebiten.Key) {
-	NewObj.down = keys[0]
-	NewObj.up = keys[1]
-	NewObj.right = keys[2]
-	NewObj.left = keys[3]
+	NewObj.Down = keys[0]
+	NewObj.Up = keys[1]
+	NewObj.Right = keys[2]
+	NewObj.Left = keys[3]
 }
 
 // Populate the Moving option with the value given int the func
 func (NewObj *MovingOption) NewOptionFromDirect(Down, Up, Right, Left ebiten.Key) {
-	NewObj.down = Down
-	NewObj.up = Up
-	NewObj.right = Right
-	NewObj.left = Left
+	NewObj.Down = Down
+	NewObj.Up = Up
+	NewObj.Right = Right
+	NewObj.Left = Left
 }
 
 // The func will rendere the display dimension if it's inside the Ground Bound
 func (Display *Ground) RenderDisplay() {
-	Display.cam = Display.background.SubImage(image.Rect(Display.camX, Display.camY, Display.camX+Display.camDimX, Display.camY+Display.camDimY)).(*ebiten.Image)
+	Display.Cam = Display.Background.SubImage(image.Rect(Display.CamX, Display.CamY, Display.CamX+Display.camDimX, Display.CamY+Display.CamDimY)).(*ebiten.Image)
 }
 
 // The func will check if the Display will overflow from the border: owf = flase, inbound = true
@@ -69,39 +69,39 @@ func isInBound(x, y, sizeCamX, sizeCamY, BackX, BackY int) bool {
 
 // Set the new Ground From an Image, default value of cam 400x400 @ 10 Unit
 func (Display *Ground) NewDefaultGroundFromImage(BackGround *ebiten.Image) {
-	Display.background = BackGround
-	Display.BackBoundX = Display.background.Bounds().Dx()
-	Display.BackBoundY = Display.background.Bounds().Dy()
+	Display.Background = BackGround
+	Display.BackBoundX = Display.Background.Bounds().Dx()
+	Display.BackBoundY = Display.Background.Bounds().Dy()
 	Display.camDimX = 400
-	Display.camDimY = 400
-	Display.camX = 0
-	Display.camY = 0
+	Display.CamDimY = 400
+	Display.CamX = 0
+	Display.CamY = 0
 	Display.Translation = 10
 	Display.RenderDisplay()
 }
 
 // Set the new Ground From a Path, default value of cam 400x400 @ 10 Unit
 func (Display *Ground) NewDefaultGroundFromPath(Path string) {
-	Display.background = LoadImage(Path)
-	Display.BackBoundX = Display.background.Bounds().Dx()
-	Display.BackBoundY = Display.background.Bounds().Dy()
+	Display.Background = LoadImage(Path)
+	Display.BackBoundX = Display.Background.Bounds().Dx()
+	Display.BackBoundY = Display.Background.Bounds().Dy()
 	Display.camDimX = 400
-	Display.camDimY = 400
-	Display.camX = 0
-	Display.camY = 0
+	Display.CamDimY = 400
+	Display.CamX = 0
+	Display.CamY = 0
 	Display.Translation = 10
 	Display.RenderDisplay()
 }
 
 // Set the new Ground From an Image and set the dimension of the cam as 'DimX'x'DimY' @ 10 Unit
 func (Display *Ground) NewGroundWithDim(BackGround *ebiten.Image, dimX, dimY int) {
-	Display.background = BackGround
-	Display.BackBoundX = Display.background.Bounds().Dx()
-	Display.BackBoundY = Display.background.Bounds().Dy()
+	Display.Background = BackGround
+	Display.BackBoundX = Display.Background.Bounds().Dx()
+	Display.BackBoundY = Display.Background.Bounds().Dy()
 	Display.camDimX = dimX
-	Display.camDimY = dimY
-	Display.camX = 0
-	Display.camY = 0
+	Display.CamDimY = dimY
+	Display.CamX = 0
+	Display.CamY = 0
 	Display.Translation = 10
 	Display.RenderDisplay()
 }
@@ -117,8 +117,8 @@ func (Display *Ground) SetCamSpeed(speedUnit int) {
 
 func (Display *Ground) SetNewCoordinate(x, y int) {
 	if x >= 0 && y >= 0 {
-		Display.camX = x
-		Display.camY = y
+		Display.CamX = x
+		Display.CamY = y
 	} else {
 		Display.ErrorOnCam = "x_and_y_must_Be_Positive"
 	}
@@ -128,46 +128,46 @@ func (Display *Ground) SetNewCoordinate(x, y int) {
 func (Display *Ground) ResizeCam(dimX, dimY int) {
 	Display.SetNewCoordinate(0, 0)
 	Display.camDimX = dimX
-	Display.camDimY = dimY
+	Display.CamDimY = dimY
 }
 
 // Return the Center of the Cam as x , y int
 func (Display *Ground) GetCenterPosition() (int, int) {
-	return Display.camDimX / 2, Display.camDimY / 2
+	return Display.camDimX / 2, Display.CamDimY / 2
 }
 
 // if the cam is touching one the border will return true.
 // Bool Order Up - Down - Right - Left
-func (Display *Ground) IsTouchingBorder() (bool, bool, bool, bool) {
-	var up, down, right, left bool = false, false, false, false
-	if Display.camX+Display.camDimX >= Display.BackBoundX {
-		right = true
+func (Display *Ground) isTouchingBorder() (bool, bool, bool, bool) {
+	var up, down, Right, left bool = false, false, false, false
+	if Display.CamX+Display.camDimX >= Display.BackBoundX {
+		Right = true
 	}
-	if Display.camY+Display.camDimY >= Display.BackBoundY {
+	if Display.CamY+Display.CamDimY >= Display.BackBoundY {
 		up = true
 	}
-	if Display.camX <= 0 {
+	if Display.CamX <= 0 {
 		left = true
 	}
-	if Display.camY <= 0 {
+	if Display.CamY <= 0 {
 		down = true
 	}
-	return up, down, right, left
+	return up, down, Right, left
 }
 
 // Check the size and move the cam of 10
 func (Display *Ground) MovingCam(move MovingOption) {
-	if ebiten.IsKeyPressed(move.up) && isInBound(Display.camX, Display.camY-Display.Translation, Display.camDimX, Display.camDimY, Display.BackBoundX, Display.BackBoundY) {
-		Display.camY -= Display.Translation
+	if ebiten.IsKeyPressed(move.Up) && isInBound(Display.CamX, Display.CamY-Display.Translation, Display.camDimX, Display.CamDimY, Display.BackBoundX, Display.BackBoundY) {
+		Display.CamY -= Display.Translation
 	}
-	if ebiten.IsKeyPressed(move.left) && isInBound(Display.camX-Display.Translation, Display.camY, Display.camDimX, Display.camDimY, Display.BackBoundX, Display.BackBoundY) {
-		Display.camX -= Display.Translation
+	if ebiten.IsKeyPressed(move.Left) && isInBound(Display.CamX-Display.Translation, Display.CamY, Display.camDimX, Display.CamDimY, Display.BackBoundX, Display.BackBoundY) {
+		Display.CamX -= Display.Translation
 	}
-	if ebiten.IsKeyPressed(move.down) && isInBound(Display.camX, Display.camY+Display.Translation, Display.camDimX, Display.camDimY, Display.BackBoundX, Display.BackBoundY) {
-		Display.camY += Display.Translation
+	if ebiten.IsKeyPressed(move.Down) && isInBound(Display.CamX, Display.CamY+Display.Translation, Display.camDimX, Display.CamDimY, Display.BackBoundX, Display.BackBoundY) {
+		Display.CamY += Display.Translation
 	}
-	if ebiten.IsKeyPressed(move.right) && isInBound(Display.camX+Display.Translation, Display.camY, Display.camDimX, Display.camDimY, Display.BackBoundX, Display.BackBoundY) {
-		Display.camX += Display.Translation
+	if ebiten.IsKeyPressed(move.Right) && isInBound(Display.CamX+Display.Translation, Display.CamY, Display.camDimX, Display.CamDimY, Display.BackBoundX, Display.BackBoundY) {
+		Display.CamX += Display.Translation
 	}
 
 	Display.RenderDisplay()
