@@ -17,15 +17,15 @@ import (
 
 //#Region CamController
 type Ground struct {
-	background, cam              *ebiten.Image
-	camX, camY, camDimX, camDimY int
+	Background, Cam              *ebiten.Image
+	CamX, CamY, CamDimX, CamDimY int
 	BackBoundX, BackBoundY       int
 	Translation                  int
 	ErrorOnCam                   string
 }
 
 type MovingOption struct {
-	up, down, right, left ebiten.Key
+	Up, Down, Right, Left ebiten.Key
 }
 
 // Populate the Moving option with default value WASD
@@ -138,7 +138,7 @@ func (Display *Ground) GetCenterPosition() (int, int) {
 
 // if the cam is touching one the border will return true.
 // Bool Order Up - Down - Right - Left
-func (Display *Ground) isTouchingBorder() (bool, bool, bool, bool) {
+func (Display *Ground) IsTouchingBorder() (bool, bool, bool, bool) {
 	var up, down, right, left bool = false, false, false, false
 	if Display.camX+Display.camDimX >= Display.BackBoundX {
 		right = true
